@@ -1,0 +1,34 @@
+import os
+import hashlib
+
+def scan_file(file_path):
+    with open(file_path, 'rb') as f:
+        bytes = f.read()
+        md5_hash = hashlib.md5(bytes).hexdigest()
+        sha1_hash = hashlib.sha1(bytes).hexdigest()
+        sha256_hash = hashlib.sha256(bytes).hexdigest()
+        # Check if the file hash matches any known malware signatures
+        if md5_hash in malware_signatures or sha1_hash in malware_signatures or sha256_hash in malware_signatures:
+            print(f"{file_path} is infected with malware.")
+            # Quarantine the infected file
+            quarantine_file(file_path)
+
+def quarantine_file(file_path):
+    # Move the infected file to a quarantine folder
+    os.makedirs('quarantine', exist_ok=True)
+    quarantine_path = os.path.join('quarantine', os.path.basename(file_path))
+    os.rename(file_path, quarantine_path)
+    print(f"{file_path} has been quarantined.")
+
+# List of known malware signatures
+malware_signatures = {
+    'MD5_HASH_OF_MALWARE_1',
+    'SHA1_HASH_OF_MALWARE_2',
+    'SHA256_HASH_OF_MALWARE_3'
+}
+
+# Scan all files in the current directory and subdirectories
+for root, dirs, files in os.walk('.'):
+    for file_name in files:
+        file_path = os.path.join(root, file_name)
+        scan_file(file_path)
